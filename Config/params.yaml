@@ -1,0 +1,9 @@
+#Hyper parameters
+hyperparameter:
+  split_ratio: 0.2
+  model_dim: 5
+  max_len: 1000
+  num_head: 5
+  num_layer: 2
+  seq_len: 155
+  pre_len: 155
