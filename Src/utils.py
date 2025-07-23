@@ -2,6 +2,7 @@ from torch.utils.data import DataLoader
 import os
 import yaml
 import torch
+import random
 
 import data_processing
 import __init__
@@ -10,6 +11,8 @@ import train
 
 def main():
     # get config
+    random.seed(220)
+
     rootpath = __init__.PathInit('PathInit').get_root()
 
     config_path = os.path.join(rootpath, 'Config', 'params.yaml') 
@@ -49,5 +52,8 @@ def main():
         test_loss = train.Train_Evaluate.evaluate(model, testdata_loader, criterion)
         print(f'Epoch [{epoch+1}/{epochs}] | Train Loss: {train_loss:.6f} | Test Loss: {test_loss:.6f}')
     
+    # torch.save(model.state_dict(), 'weather_transformer.pth')
+    print("Training finish.")
+
 if __name__ == "__main__":
     main()

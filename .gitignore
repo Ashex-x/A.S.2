@@ -1,2 +1,8 @@
 # DataFiles
 Data/
+
+# Tarining data
+weather_transformer.pth
+
+# py cache
+Src/__pycache__
