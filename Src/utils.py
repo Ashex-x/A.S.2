@@ -49,5 +49,8 @@ def main():
         test_loss = train.Train_Evaluate.evaluate(model, testdata_loader, criterion)
         print(f'Epoch [{epoch+1}/{epochs}] | Train Loss: {train_loss:.6f} | Test Loss: {test_loss:.6f}')
     
+    torch.save(model.state_dict(), 'weather_transformer.pth')
+    print("Training finish.")
+
 if __name__ == "__main__":
     main()
