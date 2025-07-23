@@ -1,16 +1,18 @@
 import pandas
-import torchvision.transforms as transforms
 import torch
 import os
-import yaml
+from torch.utils.data import Dataset
+# from torch.utils.data import Dataset
 
 import __init__
 
 class LoadData:
-    def __init__(self, split_ratio, rootpath):
+    def __init__(self, split_ratio, rootpath, device, features, model_dim):
         self.split_ratio = split_ratio
         self.rootpath = rootpath
-        
+        self.device = device
+        self.features = features
+        self.model_dim = model_dim
 
     def load_data(self):
         #get the root path
@@ -40,7 +42,34 @@ class LoadData:
         savepath_test = os.path.join(abs_savepath, 'Processed Test.csv')
         pandas.DataFrame(nor_traintensor.numpy()).to_csv(savepath_train, index=False, header=False)
         pandas.DataFrame(nor_testtensor.numpy()).to_csv(savepath_test, index=False, header=False)
-        return nor_traintensor, nor_testtensor, range_vals, min_vals
+
+        nor_traintensor = nor_traintensor.to(self.device)
+        nor_testtensor = nor_testtensor.to(self.device)
+
+        lineartrasform = torch.nn.Linear(in_features=self.features, out_features=self.model_dim).to(self.device)
+        
+        nor_traintensor = lineartrasform(nor_traintensor)
+        nor_testtensor = lineartrasform(nor_testtensor)
+        
+        return nor_traintensor, nor_testtensor
+
+class SetDataset(Dataset):
+    def __init__(self, data, seq_len, pred_len):
+        self.data = data
+        self.seq_len = seq_len
+        self.pred_len = pred_len
+
+        # print (f"{self.data.shape} {self.data[:5]}")
+        
+    def __len__(self):
+        return len(self.data) - self.seq_len - self.pred_len + 1
+    
+    def __getitem__(self, idx):
+        x = self.data[idx:idx + self.seq_len]
+        y = self.data[idx + self.seq_len: idx + self.seq_len + self.pred_len]
+        # print (x.shape)
+        # print (y.shape)
+        return x, y
 
 #if __name__ == "__main__":
 #    LD = LoadData("")

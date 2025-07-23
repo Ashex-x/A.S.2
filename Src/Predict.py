@@ -50,11 +50,16 @@ class SinCosPosEncoding(torch.nn.Module):
         self.max_len = max_len
 
         pe = torch.zeros(self.max_len, self.model_dim)
+        # position[[ 0.], [ 1.], [ 2.], [ 3.], ... [ 999.]]
         position = torch.arange(0, self.max_len, dtype=torch.float).unsqueeze(1)
         div_term = torch.exp(torch.arange(0, self.model_dim, 2).float() * (-numpy.log(10000) / self.model_dim))
         
         pe[:, 0::2] = torch.sin(position * div_term)
-        pe[:, 1::2] = torch.cos(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term[:(self.model_dim // 2)])
+        # if self.model_dim % 2 == 0:
+        #     pe[:, 1::2] = torch.cos(position * div_term[:, :self.model_dim // 2])
+        # else:
+        #     pe[:, 1::2] = torch.cos(position * div_term[:, :(self.model_dim - 1)// 2])
         
         self.register_buffer('pe', pe.unsqueeze(0))
 
