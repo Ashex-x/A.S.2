@@ -1,9 +1,13 @@
 #Hyper parameters
 hyperparameter:
   split_ratio: 0.2
-  model_dim: 5
+  model_dim: 64
   max_len: 1000
-  num_head: 5
+  num_head: 8
   num_layer: 2
-  seq_len: 155
-  pre_len: 155
+  seq_len: 32
+  pred_len: 1
+  batch_size: 128
+  learning_rate: 0.001
+  epochs: 10000
+  features: 5
