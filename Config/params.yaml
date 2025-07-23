@@ -4,10 +4,10 @@ hyperparameter:
   model_dim: 64
   max_len: 1000
   num_head: 8
-  num_layer: 2
+  num_layer: 64
   seq_len: 32
   pred_len: 1
-  batch_size: 128
+  batch_size: 32
   learning_rate: 0.001
-  epochs: 10000
+  epochs: 100
   features: 5

@@ -2,6 +2,7 @@ from torch.utils.data import DataLoader
 import os
 import yaml
 import torch
+import random
 
 import data_processing
 import __init__
@@ -10,6 +11,8 @@ import train
 
 def main():
     # get config
+    random.seed(220)
+
     rootpath = __init__.PathInit('PathInit').get_root()
 
     config_path = os.path.join(rootpath, 'Config', 'params.yaml') 
