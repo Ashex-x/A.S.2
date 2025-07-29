@@ -1,0 +1,18 @@
+[tool.ruff]
+# Formatting rules (similar to Black)
+line-length = 120
+indent-width = 2
+
+[tool.ruff.format]
+# Explicitly enable formatting (Ruff replaces Black/isort)
+indent-style = "space"  # or "tab"
+quote-style = "double"  # or "single"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+addopts = [
+  "-o log_cli=true",
+  "--capture=no",
+  "--verbose",
+  "-rP"
+]

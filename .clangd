@@ -1,0 +1,2 @@
+CompileFlags:
+  Add: [-I/dynamo_/inc/kinematic.h]

@@ -1,8 +1,77 @@
-# DataFiles
-Data/
+# .gitignore
 
-# Tarining data
-weather_transformer.pth
+# Ignore OS/system files
+.DS_Store
+Thumbs.db
+*.swp
 
-# py cache
-Src/__pycache__
+# Ignore IDE/project files
+.vscode/
+.idea/
+*sublime-workspace
+
+# Ignore compiled files
+*.pyc
+*.so
+*.o
+__pycache__
+
+build/
+dist/
+lab/
+
+# Ignore environment/config files
+.env
+*.local
+
+# Ignore log files
+*.log
+
+# Ignore some building files
+workflow
+test
+exp
+
+# Ignore lib symlink files
+src/eva/lib/*
+
+# Ignore torch tensor files
+*.pt
+
+# Ignore something nonsense
+.vimroot
+
+# Ignore my lab
+lab.ipynb
+
+# Ignore training outputs and weights of yolo
+#  and some deprecated projects
+hw/
+guide/
+tests/*.jpg
+UI/others
+
+# Ignore test images in root
+/*.jpg
+/*.png
+
+# Ignore tensorboard logs
+tb_logs
+wandb_logs
+
+bkup
+temp
+
+# Ignore database
+src/eva/database/schedules.db
+
+src/cache/
+src/weights/
+src/datasets/
+src/checkpoints/
+src/eva/vision/runs/
+src/eva/vision/face/
+src/eva/vision/utils/
+src/eva/vision/exp10-new
+src/eva/web/static/captures
+src/eva/dl_utils/fatuus/cache
