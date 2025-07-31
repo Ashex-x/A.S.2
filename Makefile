@@ -6,13 +6,18 @@ C_IGNORED_FILES := ./dynamo_/include/UTL.hpp ./path/to/bad_file.cpp  # <- this i
 C_SRC_FILES := $(shell find $(C_SRC_DIRS) -type f \( $(foreach ext,$(C_SRC_EXTENSIONS), -iname '*.$(ext)' -o ) -false \))
 C_FORMATTABLE_FILES := $(filter-out $(C_IGNORED_FILES),$(C_SRC_FILES))
 
-.PHONY: style show-files check-style test clean clean-logs clean-cache gen-docs
+.PHONY: style pylint show-files check-style test clean clean-logs clean-cache gen-docs
 
 style:
 	@echo "Formatting Python files... 💅"
 	@find . -name '*.py' -exec ruff format --config pyproject.toml {} + -o -name '*.pyi' -exec ruff format --config pyproject.toml {} +
 	@echo "Formatting C/CPP files... 💅"
 	@$(foreach file,$(C_FORMATTABLE_FILES), clang-format -i $(file) && echo "✨ Formatted: $(file)";)
+	@echo "Formatting done! 💖"
+
+pylint:
+	@echo "Formatting Python files... 💅"
+	@find . -name '*.py' -exec pylint --rcfile=.pylintrc {} + -o -name '*.pyi' -exec pylint --rcfile=.pylintrc {} +
 	@echo "Formatting done! 💖"
 
 show-files:

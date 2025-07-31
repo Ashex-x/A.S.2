@@ -6,7 +6,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from data_processing import LoadData, SetDataset
-from predict import Transformer
+from model import Transformer
 from train import TrainEvaluate
 from src import PathInit
 
