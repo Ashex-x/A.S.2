@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 # .gitignore
 
 # Ignore OS/system files
@@ -75,3 +76,9 @@ src/eva/vision/utils/
 src/eva/vision/exp10-new
 src/eva/web/static/captures
 src/eva/dl_utils/fatuus/cache
+=======
+# DataFiles
+Data/
+
+*.pth
+>>>>>>> Stashed changes
