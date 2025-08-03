@@ -7,35 +7,51 @@ import numpy as np
 
 
 class Transformer(nn.Module):
-  def __init__(self, num_head, model_dim, max_len, num_layer, pre_len):
-    super().__init__()
-    self.num_head = num_head
-    self.model_dim = model_dim
-    self.max_len = max_len
-    self.num_layer = num_layer
-    self.pre_len = pre_len
+    def __init__(self, num_head, model_dim, max_len, num_layer, pre_len):
+        super().__init__()
+        self.num_head = num_head
+        self.model_dim = model_dim
+        self.max_len = max_len
+        self.num_layer = num_layer
+        self.pre_len = pre_len
 
-    self.input_linear = nn.Linear(self.model_dim, self.model_dim)
+        # Input projection
+        self.input_linear = nn.Linear(self.model_dim, self.model_dim)
+        
+        # Positional encoding
+        self.pos_encode = SinCosPosEncoding(self.model_dim, self.max_len)
+        
+        # Transformer encoder
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=self.model_dim,
+            nhead=self.num_head,
+            batch_first=True,
+            dropout=0.1  # Add dropout for regularization
+        )
+        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=self.num_layer)
+        
+        # Modified output layer to match target shape
+        self.output_layer = nn.Sequential(
+            nn.Linear(self.model_dim, 64),
+            nn.ReLU(),
+            nn.Linear(64, self.pre_len * self.model_dim),  # Adjust for multi-step prediction
+            nn.Unflatten(1, (self.pre_len, self.model_dim))  # Reshape to [batch, pred_len, features]
+        )
 
-    self.pos_encode = SinCosPosEncoding(self.model_dim, self.max_len)
-
-    encoder_layer = nn.TransformerEncoderLayer(d_model=self.model_dim, nhead=self.num_head, batch_first=True)
-
-    self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=self.num_layer)
-
-    self.output_layer = nn.Sequential(nn.Linear(self.model_dim, 64), nn.ReLU(), nn.Linear(64, self.pre_len))
-
-  def forward(self, src):
-    src = self.input_linear(src)
-
-    src = self.pos_encode(src)
-
-    memory = self.transformer_encoder(src)
-
-    last_step = memory[:, -1, :]
-
-    output = self.output_layer(last_step)  # [batch, pred_length]
-    return output
+    def forward(self, src):
+        # Input projection
+        src = self.input_linear(src)
+        
+        # Add positional encoding
+        src = self.pos_encode(src)
+        
+        # Transformer processing
+        memory = self.transformer_encoder(src)
+        
+        # Modified output - predict for all features
+        output = self.output_layer(memory[:, -1, :])  # Use last step to predict future
+        
+        return output  # Shape: [batch, pred_len, features]
 
 
 class SinCosPosEncoding(nn.Module):

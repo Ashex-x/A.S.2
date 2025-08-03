@@ -5,9 +5,9 @@ import random
 import torch
 from torch.utils.data import DataLoader
 
-from data_processing import LoadData, SetDataset
-from model import Transformer
-from train import TrainEvaluate
+from src.data_processing import LoadData, SetDataset
+from src.model import Transformer
+from src.train import TrainEvaluate
 from src import PathInit
 
 
@@ -16,7 +16,7 @@ def main():
   random.seed(220)
   rootpath = PathInit("PathInit").get_root()
 
-  config_path = os.path.join(rootpath, "Config", "params.yaml")
+  config_path = os.path.join(rootpath, "config", "params.yaml")
   with open(config_path, "r") as file:
     config = yaml.safe_load(file)
 
@@ -32,7 +32,8 @@ def main():
   pred_len = config["hyperparameter"]["pred_len"]
   features = config["hyperparameter"]["features"]
 
-  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+  device = torch.device("cpu")
 
   train_data, test_data = LoadData(split_ratio, rootpath, device, features, model_dim).normalize_data()
   # print(train_data[:5], test_data[:5], rangeval, minval)
@@ -45,11 +46,48 @@ def main():
 
   model = Transformer(num_head, model_dim, max_len, num_layer, pred_len).to(device)
 
-  criterion = torch.nn.MSELoss().to(device)
+  criterion = torch.nn.functional.mse_loss
   optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
+  model.train()
+  for epoch in range(epochs):  # You should have epoch loop
+      total_loss = 0.0
+      for inputs, targets in train_data_loader:
+          # 1. Clear gradients FIRST
+          optimizer.zero_grad()
+          
+          # 2. Ensure proper device placement
+          inputs, targets = inputs.to(device), targets.to(device)
+          
+          # 3. Forward pass
+          outputs = model(inputs)
+          
+          # 4. Verify shapes match exactly
+          print(f'Output shape: {outputs.shape}, Target shape: {targets.shape}')
+          if outputs.shape != targets.shape:
+              # If you need to select first feature from targets:
+              targets = targets[:, :, 0].contiguous()  # Make explicit copy
+              
+          # 5. Loss calculation
+          loss = criterion(outputs, targets)
+          
+          # 6. Backward pass
+          loss.backward()
+          
+          # 7. Optional: gradient clipping
+          torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+          
+          # 8. Update weights
+          optimizer.step()
+          
+          total_loss += loss.item()
+      
+      print(f'Epoch {epoch+1}, Loss: {total_loss/len(train_data_loader)}')
+
+  return
+
   for epoch in range(epochs):
-    train_loss = TrainEvaluate.Train(model, train_data_loader, optimizer, criterion)
+    train_loss = TrainEvaluate.train(model, train_data_loader, optimizer, criterion)
     test_loss = TrainEvaluate.evaluate(model, test_data_loader, criterion)
     print(f"Epoch [{epoch + 1}/{epochs}] | Train Loss: {train_loss:.6f} | Test Loss: {test_loss:.6f}")
 
